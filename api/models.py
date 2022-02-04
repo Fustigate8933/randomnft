@@ -11,3 +11,6 @@ markets = [
 ]
 class MarketPlace(models.Model):
     market = models.CharField(max_length=100, choices=markets, default="opensea")
+
+class ImageLink(models.Model):
+    src = models.CharField(max_length=500)

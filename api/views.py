@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework import generics
-from .models import MarketPlace
-from .serializers import MarketPlaceSerializer
+from rest_framework import generics, status
+from .models import MarketPlace, ImageLink
+from .serializers import MarketPlaceSerializer, ImageLinkSerializer
 from rest_framework.response import Response
 from selenium import webdriver
 
@@ -23,21 +23,21 @@ class SearchMarketPlace(APIView):
         driver.get("https://opensea.io/assets")
 
         img_paths = driver.find_elements_by_class_name("Image--image")
-        driver.implicitly_wait(6)
+        driver.implicitly_wait(15)
 
         imgs = [img_paths[i].get_attribute('src') for i in range(len(img_paths))]
-        imgs_ = []
 
         for i in imgs:
             if i != None:
-                imgs_.append(i)
+                image_link = ImageLink(src=i)
+                image_link.save()
+                print(i)
+
         driver.close()
 
-        print(imgs_)
-
-        return Response(imgs_)
+        return Response({"msg": "POST success"}, status=status.HTTP_201_CREATED)
 
 
-class ListMarketPlace(generics.ListAPIView):
-    queryset = MarketPlace.objects.all()
-    serializer_class = MarketPlaceSerializer
+class ListImageLinks(generics.ListAPIView):
+    queryset = ImageLink.objects.all()
+    serializer_class = ImageLinkSerializer
